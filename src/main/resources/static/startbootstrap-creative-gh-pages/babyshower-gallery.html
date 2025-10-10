@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wedding Gallery</title>
+  <!-- Bootstrap CSS -->
+  <link href="css/bootstrap.min.css" rel="stylesheet">
+  <!-- Custom CSS -->
+  <link href="css/styles.css" rel="stylesheet">
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">Photography Studio</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="index.html#portfolio">Gallery</a></li>
+          <li class="nav-item"><a class="nav-link" href="index.html#reviews">Reviews</a></li>
+          <li class="nav-item"><a class="nav-link" href="index.html#contact">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+
+  <!-- Gallery Section -->
+  <div class="container py-5" style="margin-top: 70px;">
+    <h2 class="text-center mb-4">Baby Shower Gallery</h2>
+    <div class="row g-4" id="galleryContainer">
+
+    <!-- Images will load here -->
+    </div>
+  </div>
+
+
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+        fetch("/api/admin/gallery/babyshower") // change to wedding or prewedding on other pages
+          .then(res => res.json())
+          .then(images => {
+            const container = document.getElementById("galleryContainer");
+            container.innerHTML = ""; // clear old content
+
+            if (images.length === 0) {
+              container.innerHTML = "<p class='text-center text-muted'>No images uploaded yet.</p>";
+              return;
+            }
+
+            images.forEach(imgUrl => {
+              const col = document.createElement("div");
+              col.className = "col-lg-4 col-md-6 col-sm-12";
+              col.innerHTML = `
+                <div class="card shadow-sm">
+                  <img src="${imgUrl}" class="card-img-top rounded" alt="Image">
+                </div>
+              `;
+              container.appendChild(col);
+            });
+          })
+          .catch(err => console.error("Error loading gallery:", err));
+      });
+  </script>
+
+
+
+
+
+
+
+  <!-- Footer -->
+  <footer class="bg-dark text-white text-center py-4">
+    <div class="container">
+      <p>&copy; 2025 Photography Studio. All Rights Reserved.</p>
+      <div class="d-flex justify-content-center">
+        <a href="#" class="text-white mx-2"><i class="bi bi-facebook"></i></a>
+        <a href="#" class="text-white mx-2"><i class="bi bi-instagram"></i></a>
+        <a href="#" class="text-white mx-2"><i class="bi bi-whatsapp"></i></a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Bootstrap JS -->
+  <script src="js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

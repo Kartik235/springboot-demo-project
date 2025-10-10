@@ -1,0 +1,220 @@
+<!--<!DOCTYPE html>-->
+<!--<html lang="en">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+<!--    <title>Admin - Upload Image</title>-->
+<!--</head>-->
+<!--<body>-->
+<!--&lt;!&ndash; Navbar &ndash;&gt;-->
+<!--<nav style="background: #333; padding: 10px;">-->
+<!--    <a href="admin.html" style="color: white; margin-right: 15px; text-decoration: none;">Dashboard</a>-->
+<!--    <a href="admin-bookings.html" style="color: white; margin-right: 15px; text-decoration: none;">Bookings</a>-->
+<!--    <a href="admin-reviews.html" style="color: white; margin-right: 15px; text-decoration: none;">Reviews</a>-->
+<!--    <a href="admin-gallery.html" style="color: yellow; text-decoration: none;">Upload Image</a>-->
+<!--</nav>-->
+
+<!--<h2 style="margin: 20px;">🖼️ Upload Gallery Image</h2>-->
+
+<!--<form id="galleryUploadForm" style="margin: 20px;" enctype="multipart/form-data">-->
+<!--    <label for="category">Select Category:</label>-->
+<!--    <select id="category" name="category" required>-->
+<!--        <option value="wedding">Wedding</option>-->
+<!--        <option value="prewedding">Pre-Wedding</option>-->
+<!--        <option value="babyshower">Baby Shower</option>-->
+<!--    </select>-->
+<!--    <br><br>-->
+
+<!--    <label for="image">Choose Image:</label>-->
+<!--    <input type="file" id="image" name="image" accept="image/*" required>-->
+<!--    <br><br>-->
+
+<!--    <button type="submit">Upload Image</button>-->
+<!--</form>-->
+
+<!--<div id="uploadMessage" style="margin:20px; color: green;"></div>-->
+<!--<div class="container py-5">-->
+<!--    <h2>Uploaded Images</h2>-->
+<!--    <div class="row g-4" id="adminGalleryContainer">-->
+<!--        &lt;!&ndash; Images with delete buttons will appear here &ndash;&gt;-->
+<!--    </div>-->
+<!--</div>-->
+
+
+<!--<script>-->
+<!--    document.getElementById("galleryUploadForm").addEventListener("submit", async function(e) {-->
+<!--        e.preventDefault();-->
+
+<!--        const formData = new FormData();-->
+<!--        formData.append("category", document.getElementById("category").value);-->
+<!--        formData.append("image", document.getElementById("image").files[0]);-->
+
+<!--        try {-->
+<!--            const response = await fetch("/api/admin/gallery/upload", {-->
+<!--                method: "POST",-->
+<!--                body: formData-->
+<!--            });-->
+
+<!--            if (response.ok) {-->
+<!--                document.getElementById("uploadMessage").innerText = "✅ Image uploaded successfully!";-->
+<!--            } else {-->
+<!--                document.getElementById("uploadMessage").innerText = "❌ Upload failed!";-->
+<!--            }-->
+<!--        } catch (error) {-->
+<!--            document.getElementById("uploadMessage").innerText = "⚠️ Error uploading image!";-->
+<!--        }-->
+<!--    });-->
+<!--</script>-->
+<!--</body>-->
+<!--</html>-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Gallery</title>
+    <style>
+        .gallery-grid {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 15px;
+          margin: 20px;
+        }
+        .gallery-item {
+          border: 1px solid #ccc;
+          padding: 10px;
+          text-align: center;
+        }
+        .gallery-item img {
+          width: 200px;
+          height: 150px;
+          object-fit: cover;
+          display: block;
+          margin-bottom: 10px;
+        }
+        .delete-btn {
+          background: red;
+          color: white;
+          border: none;
+          padding: 5px 10px;
+          cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<!-- Navbar -->
+<nav style="background: #333; padding: 10px;">
+    <a href="admin.html" style="color: white; margin-right: 15px; text-decoration: none;">Dashboard</a>
+    <a href="admin-bookings.html" style="color: white; margin-right: 15px; text-decoration: none;">Bookings</a>
+    <a href="admin-reviews.html" style="color: white; margin-right: 15px; text-decoration: none;">Reviews</a>
+    <a href="admin-gallery.html" style="color: yellow; text-decoration: none;">Gallery</a>
+</nav>
+
+<h2 style="margin: 20px;">🖼️ Upload Gallery Image</h2>
+
+<form id="galleryUploadForm" style="margin: 20px;" enctype="multipart/form-data">
+    <label for="category">Select Category:</label>
+    <select id="category" name="category" required>
+        <option value="wedding">Wedding</option>
+        <option value="prewedding">Pre-Wedding</option>
+        <option value="babyshower">Baby Shower</option>
+    </select>
+    <br><br>
+
+    <label for="image">Choose Image:</label>
+    <input type="file" id="image" name="image" accept="image/*" required>
+    <br><br>
+
+    <button type="submit">Upload Image</button>
+</form>
+
+<div id="uploadMessage" style="margin:20px; color: green;"></div>
+
+<h2 style="margin: 20px;">Uploaded Images</h2>
+<div class="gallery-grid" id="adminGalleryContainer">
+    <!-- Images with delete buttons will appear here -->
+</div>
+
+<script>
+    const galleryContainer = document.getElementById("adminGalleryContainer");
+    const categorySelect = document.getElementById("category");
+
+    // Fetch and show images for selected category
+    async function loadGallery() {
+      const category = categorySelect.value;
+      try {
+        const res = await fetch(`/api/admin/gallery/${category}`);
+        const images = await res.json();
+        galleryContainer.innerHTML = "";
+
+        if (images.length === 0) {
+          galleryContainer.innerHTML = "<p>No images uploaded yet.</p>";
+          return;
+        }
+
+        images.forEach(url => {
+          const filename = url.split("/").pop();
+          galleryContainer.innerHTML += `
+            <div class="gallery-item">
+              <img src="${url}" alt="${filename}">
+              <button class="delete-btn" onclick="deleteImage('${category}', '${filename}')">Delete</button>
+            </div>
+          `;
+        });
+      } catch (err) {
+        console.error("Error loading gallery", err);
+      }
+    }
+
+    // Upload image
+    document.getElementById("galleryUploadForm").addEventListener("submit", async function(e) {
+      e.preventDefault();
+
+      const formData = new FormData();
+      formData.append("category", categorySelect.value);
+      formData.append("image", document.getElementById("image").files[0]);
+
+      try {
+        const response = await fetch("/api/admin/gallery/upload", {
+          method: "POST",
+          body: formData
+        });
+
+        if (response.ok) {
+          document.getElementById("uploadMessage").innerText = "✅ Image uploaded successfully!";
+          loadGallery(); // refresh images after upload
+        } else {
+          document.getElementById("uploadMessage").innerText = "❌ Upload failed!";
+        }
+      } catch (error) {
+        document.getElementById("uploadMessage").innerText = "⚠️ Error uploading image!";
+      }
+    });
+
+    // Delete image
+    async function deleteImage(category, filename) {
+      if (confirm("Delete this image?")) {
+        try {
+          const res = await fetch(`/api/admin/gallery/delete?category=${category}&filename=${filename}`, {
+            method: "DELETE"
+          });
+          if (res.ok) {
+            alert("Image deleted!");
+            loadGallery();
+          } else {
+            alert("Failed to delete image");
+          }
+        } catch (err) {
+          console.error("Error deleting image", err);
+        }
+      }
+    }
+
+    // Load gallery on page load
+    categorySelect.addEventListener("change", loadGallery);
+    loadGallery();
+</script>
+</body>
+</html>
+

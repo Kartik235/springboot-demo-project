@@ -1,0 +1,24 @@
+/* Hide admin nav until login */
+.admin-only { display: none; }
+
+/* Sections spacing (keeps template rhythm) */
+#booking, #reviews { scroll-margin-top: 90px; } /* nicer anchor jump under fixed navbar */
+
+/* Reviews list cards */
+.review-card {
+  background: #ffffff;
+  color: #333;
+  border-radius: 12px;
+  padding: 16px 18px;
+  margin-bottom: 12px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+}
+.review-card .name { font-weight: 700; }
+.review-card .meta { font-size: .875rem; opacity: .8; }
+.review-card .text { margin: 8px 0 0; }
+
+/* Booking form note */
+.form-note { opacity: .8; }
+
+/* Small polish for selects inside .form-floating */
+.form-floating > select.form-control { padding-top: 1.625rem; }

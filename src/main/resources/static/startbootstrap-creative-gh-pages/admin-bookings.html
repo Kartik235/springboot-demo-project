@@ -1,0 +1,78 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin - Bookings</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background: #f4f4f4; }
+    button { padding: 5px 10px; cursor: pointer; }
+  </style>
+</head>
+<body>
+<!-- Navbar -->
+<nav style="background: #333; padding: 10px;">
+  <a href="admin.html" style="color: white; margin-right: 15px; text-decoration: none;">Dashboard</a>
+  <a href="admin-bookings.html" style="color: white; margin-right: 15px; text-decoration: none;">Bookings</a>
+  <a href="admin-reviews.html" style="color: white; text-decoration: none;">Reviews</a>
+</nav>
+
+<h1>📅 All Bookings</h1>
+<table id="bookingTable">
+  <thead>
+  <tr>
+    <th>ID</th>
+    <th>Name</th>
+    <th>Email</th>
+    <th>Phone</th>
+    <th>Date</th>
+    <th>Package</th>
+    <th>Message</th>
+    <th>Created At</th>
+    <th>Action</th>
+  </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<script>
+  async function loadBookings() {
+    try {
+      const res = await fetch("/api/admin/all");
+      const data = await res.json();
+      const tbody = document.querySelector("#bookingTable tbody");
+      tbody.innerHTML = "";
+      data.forEach(b => {
+        tbody.innerHTML += `
+          <tr>
+            <td>${b.id}</td>
+            <td>${b.name}</td>
+            <td>${b.email}</td>
+            <td>${b.phone}</td>
+            <td>${b.date}</td>
+            <td>${b.packageType}</td>
+            <td>${b.message}</td>
+            <td>${b.createdAt || "N/A"}</td>
+            <td><button onclick="deleteBooking(${b.id})">Delete</button></td>
+          </tr>
+        `;
+      });
+    } catch (err) {
+      console.error("Error loading bookings", err);
+    }
+  }
+
+  async function deleteBooking(id) {
+    if (confirm("Delete this booking?")) {
+      await fetch(`/api/admin/delete/${id}`, { method: "DELETE" });
+      loadBookings();
+    }
+  }
+
+  loadBookings();
+</script>
+</body>
+</html>
