@@ -465,169 +465,175 @@
 //}
 //
 
-
-// ===== Config =====
-const USE_BACKEND = true; // set false if you want frontend-only testing
-const API_BASE = "http://localhost:8080"; // backend URL, no extra /api
-
-// ===== Utilities =====
-const byId = (id) => document.getElementById(id);
-const stripTags = (s) => (s || "").replace(/</g, "&lt;").replace(/>/g, "&gt;"); // simple XSS guard
-const todayISO = () => new Date().toISOString().slice(0, 10);
-
-// ===== Admin nav toggle =====
-(function initRoleNav() {
-    const userStr = localStorage.getItem("user");
-    if (userStr) {
-        const user = JSON.parse(userStr);
-        const role = user.role; // expecting {role: "admin"} from backend
-        if (role === "admin") {
-            document.querySelectorAll(".admin-only").forEach(el => el.style.display = "block");
-        }
-    }
-})();
-
-// ===== Helper fetch function =====
-async function postData(url, data) {
-    if (!USE_BACKEND) {
-        console.log("Frontend-only mode, would send:", data);
-        return { ok: true, json: async () => data, text: async () => "" };
-    }
-    return fetch(`${API_BASE}${url}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
-    });
-}
-
-// =================== SIGNUP FORM ===================
-const signupForm = byId("signupForm");
-if (signupForm) {
-    signupForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
-
-        const password = byId("password").value;
-        const confirm = byId("confirm").value;
-
-        if (password !== confirm) {
-            alert("Passwords do not match!");
-            return;
-        }
-
-        const data = {
-            name: stripTags(byId("name").value),
-            email: stripTags(byId("email").value),
-            password: password
-        };
-
-        try {
-            const res = await postData("/api/auth/signup", data);
-
-            if (res.ok) {
-                alert("Signup successful!");
-                window.location.href = "login.html";
-            } else {
-                const errText = await res.text();
-                alert(errText || "Signup failed");
-            }
-        } catch (err) {
-            console.error(err);
-            alert("Error connecting to server");
-        }
-    });
-}
-
-// =================== LOGIN FORM ===================
-const loginForm = byId("loginForm");
-if (loginForm) {
-    loginForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
-
-        const data = {
-            email: stripTags(byId("email").value),
-            password: byId("password").value
-        };
-
-        try {
-            const res = await postData("/api/auth/login", data);
-
-            if (res.ok) {
-                const user = await res.json();
-                alert("Login successful!");
-                localStorage.setItem("user", JSON.stringify(user));
-                window.location.href = "index.html";
-            } else {
-                const errText = await res.text();
-                alert(errText || "Login failed");
-            }
-        } catch (err) {
-            console.error(err);
-            alert("Error connecting to server");
-        }
-    });
-}
-
-// =================== BOOKING FORM ===================
-const bookingForm = byId("bookingForm");
-if (bookingForm) {
-    bookingForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
-
-        const data = {
-            name: stripTags(byId("bname").value),
-            email: stripTags(byId("bemail").value),
-            phone: stripTags(byId("bphone").value),
-            date: byId("bdate").value,
-            packageType: stripTags(byId("bpackage").value),
-            message: stripTags(byId("bmessage").value)
-        };
-
-        try {
-            const res = await postData("/api/booking/create", data);
-
-            if (res.ok) {
-                alert("Booking successful!");
-                bookingForm.reset();
-            } else {
-                const err = await res.text();
-                alert(err || "Booking failed");
-            }
-        } catch (err) {
-            console.error(err);
-            alert("Error connecting to server");
-        }
-    });
-}
-
-// =================== REVIEW FORM ===================
-const reviewForm = byId("reviewForm");
-if (reviewForm) {
-    reviewForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
-
-        const data = {
-            name: stripTags(byId("rname").value),
-            rating: byId("rrating").value,
-            message: stripTags(byId("rmessage").value)
-        };
-
-        try {
-             const res = await postData("/api/review/create", data);
+//-------------------------------------main code--------------------------------------------------
 
 
-            if (res.ok) {
-                alert("Review submitted!");
-                reviewForm.reset();
-            } else {
-                const err = await res.text();
-                alert(err || "Review submission failed");
-            }
-        } catch (err) {
-            console.error(err);
-            alert("Error connecting to server");
-        }
-    });
-}
+//// ===== Config =====
+//const USE_BACKEND = true; // set false if you want frontend-only testing
+//const API_BASE = "http://localhost:8080"; // backend URL, no extra /api
+//
+//// ===== Utilities =====
+//const byId = (id) => document.getElementById(id);
+//const stripTags = (s) => (s || "").replace(/</g, "&lt;").replace(/>/g, "&gt;"); // simple XSS guard
+//const todayISO = () => new Date().toISOString().slice(0, 10);
+//
+//// ===== Admin nav toggle =====
+//(function initRoleNav() {
+//    const userStr = localStorage.getItem("user");
+//    if (userStr) {
+//        const user = JSON.parse(userStr);
+//        const role = user.role; // expecting {role: "admin"} from backend
+//        if (role === "admin") {
+//            document.querySelectorAll(".admin-only").forEach(el => el.style.display = "block");
+//        }
+//    }
+//})();
+//
+//// ===== Helper fetch function =====
+//async function postData(url, data) {
+//    if (!USE_BACKEND) {
+//        console.log("Frontend-only mode, would send:", data);
+//        return { ok: true, json: async () => data, text: async () => "" };
+//    }
+//    return fetch(`${API_BASE}${url}`, {
+//        method: "POST",
+//        headers: { "Content-Type": "application/json" },
+//        body: JSON.stringify(data)
+//    });
+//}
+//
+//// =================== SIGNUP FORM ===================
+//const signupForm = byId("signupForm");
+//if (signupForm) {
+//    signupForm.addEventListener("submit", async (e) => {
+//        e.preventDefault();
+//
+//        const password = byId("password").value;
+//        const confirm = byId("confirm").value;
+//
+//        if (password !== confirm) {
+//            alert("Passwords do not match!");
+//            return;
+//        }
+//
+//        const data = {
+//            name: stripTags(byId("name").value),
+//            email: stripTags(byId("email").value),
+//            password: password
+//        };
+//
+//        try {
+//            const res = await postData("/api/auth/signup", data);
+//
+//            if (res.ok) {
+//                alert("Signup successful!");
+//                window.location.href = "login.html";
+//            } else {
+//                const errText = await res.text();
+//                alert(errText || "Signup failed");
+//            }
+//        } catch (err) {
+//            console.error(err);
+//            alert("Error connecting to server");
+//        }
+//    });
+//}
+//
+//// =================== LOGIN FORM ===================
+//const loginForm = byId("loginForm");
+//if (loginForm) {
+//    loginForm.addEventListener("submit", async (e) => {
+//        e.preventDefault();
+//
+//        const data = {
+//            email: stripTags(byId("email").value),
+//            password: byId("password").value
+//        };
+//
+//        try {
+//            const res = await postData("/api/auth/login", data);
+//
+//            if (res.ok) {
+//                const user = await res.json();
+//                alert("Login successful!");
+//                localStorage.setItem("user", JSON.stringify(user));
+//                window.location.href = "index.html";
+//            } else {
+//                const errText = await res.text();
+//                alert(errText || "Login failed");
+//            }
+//        } catch (err) {
+//            console.error(err);
+//            alert("Error connecting to server");
+//        }
+//    });
+//}
+//
+//// =================== BOOKING FORM ===================
+//const bookingForm = byId("bookingForm");
+//if (bookingForm) {
+//    bookingForm.addEventListener("submit", async (e) => {
+//        e.preventDefault();
+//
+//        const data = {
+//            name: stripTags(byId("bname").value),
+//            email: stripTags(byId("bemail").value),
+//            phone: stripTags(byId("bphone").value),
+//            date: byId("bdate").value,
+//            packageType: stripTags(byId("bpackage").value),
+//            message: stripTags(byId("bmessage").value)
+//        };
+//
+//        try {
+//            const res = await postData("/api/booking/create", data);
+//
+//            if (res.ok) {
+//                alert("Booking successful!");
+//                bookingForm.reset();
+//            } else {
+//                const err = await res.text();
+//                alert(err || "Booking failed");
+//            }
+//        } catch (err) {
+//            console.error(err);
+//            alert("Error connecting to server");
+//        }
+//    });
+//}
+//
+//// =================== REVIEW FORM ===================
+//const reviewForm = byId("reviewForm");
+//if (reviewForm) {
+//    reviewForm.addEventListener("submit", async (e) => {
+//        e.preventDefault();
+//
+//        const data = {
+//            name: stripTags(byId("rname").value),
+//            rating: byId("rrating").value,
+//            message: stripTags(byId("rmessage").value)
+//        };
+//
+//        try {
+//             const res = await postData("/api/review/create", data);
+//
+//
+//            if (res.ok) {
+//                alert("Review submitted!");
+//                reviewForm.reset();
+//            } else {
+//                const err = await res.text();
+//                alert(err || "Review submission failed");
+//            }
+//        } catch (err) {
+//            console.error(err);
+//            alert("Error connecting to server");
+//        }
+//    });
+//
+//
+//
+//}
+//-----------------------------------------------------end---------------------------------------------
 
 
 // =================== BOOKING FORM ===================
@@ -690,6 +696,120 @@ if (reviewForm) {
 //        }
 //    });
 //}
+
+
+
+
+
+
+
+
+
+
+
+
+
+// ===== Config =====
+// Automatically detect backend (Render or localhost)
+const API_BASE = window.location.hostname.includes("render.com")
+  ? window.location.origin // use Render deployment URL automatically
+  : "http://localhost:8080"; // local backend
+
+console.log("Using backend:", API_BASE);
+
+// ===== Utilities =====
+const byId = (id) => document.getElementById(id);
+const stripTags = (s) => (s || "").replace(/</g, "&lt;").replace(/>/g, "&gt;"); // simple XSS guard
+const todayISO = () => new Date().toISOString().slice(0, 10);
+
+// ===== Admin nav toggle =====
+(function initRoleNav() {
+  const userStr = localStorage.getItem("user");
+  if (userStr) {
+    const user = JSON.parse(userStr);
+    const role = user.role; // expecting {role: "admin"} from backend
+    if (role === "admin") {
+      document.querySelectorAll(".admin-only").forEach((el) => (el.style.display = "block"));
+    }
+  }
+})();
+
+// ===== Helper fetch function =====
+async function postData(url, data) {
+  return fetch(`${API_BASE}${url}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+}
+
+// =================== SIGNUP FORM ===================
+const signupForm = byId("signupForm");
+if (signupForm) {
+  signupForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const password = byId("password").value;
+    const confirm = byId("confirm").value;
+
+    if (password !== confirm) {
+      alert("Passwords do not match!");
+      return;
+    }
+
+    const data = {
+      name: stripTags(byId("name").value),
+      email: stripTags(byId("email").value),
+      password: password,
+    };
+
+    try {
+      const res = await postData("/api/auth/signup", data);
+
+      if (res.ok) {
+        alert("Signup successful!");
+        window.location.href = "login.html";
+      } else {
+        const errText = await res.text();
+        alert(errText || "Signup failed");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error connecting to server");
+    }
+  });
+}
+
+// =================== LOGIN FORM ===================
+const loginForm = byId("loginForm");
+if (loginForm) {
+  loginForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const data = {
+      email: stripTags(byId("email").value),
+      password: byId("password").value,
+    };
+
+    try {
+      const res = await postData("/api/auth/login", data);
+
+      if (res.ok) {
+        const user = await res.json();
+        alert("Login successful!");
+        localStorage.setItem("user", JSON.stringify(user));
+        window.location.href = "index.html";
+      } else {
+        const errText = await res.text();
+        alert(errText || "Login failed");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error connecting to server");
+    }
+  });
+}
+
 
 
 
